@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 
 using ExampleApp.Contexts;
 using ExampleApp.Models;
@@ -102,5 +103,22 @@ public class HoneyService
 		}
 
 		return (new NoContentResult());
+	}
+
+	public async Task<Honey?> PatchAsync(
+		long id, 
+		JsonPatchDocument<Honey> patch)
+	{
+		Honey? honey = await this._honeyContext.Honeys.FindAsync(id);
+
+		if (honey == null)
+		{
+			return (null);
+		}
+
+		patch.ApplyTo(honey);
+		this._honeyContext.Honeys.Update(honey);
+		await this._honeyContext.SaveChangesAsync();
+		return (honey);
 	}
 }

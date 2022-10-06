@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 
 using ExampleApp.Models;
 using ExampleApp.Services;
@@ -45,5 +46,14 @@ public class HoneyController
 	{
 		IActionResult? result = await this._honeyService.PutAsync(id, honey);
 		return (result == null ? NotFound() : (ActionResult)result);
+	}
+
+	[HttpPatch("{id}")]
+	public async Task<ActionResult<object>> PatchAsync(
+		[FromRoute] long id, 
+		[FromBody] JsonPatchDocument<Honey> patch)
+	{
+		Honey? patched = await this._honeyService.PatchAsync(id, patch);
+		return (patched == null ? NotFound() : patched);
 	}
 }
