@@ -8,6 +8,7 @@ using ExampleApp.Services;
 namespace ExampleApp.Controllers;
 
 
+[ResponseCache(NoStore = true)]
 [Route("/api/[controller]")]
 public class HoneyController
 	: Controller
@@ -21,31 +22,9 @@ public class HoneyController
 		return;
 	}
 
-	[HttpGet]
-	public async Task<IEnumerable<Honey>> GetAllAsync()
-	{
-		IEnumerable<Honey> honeys = await this._honeyService.ListAsync();
-		return (honeys);
-	}
-
-	[HttpDelete]
-	public async Task<ActionResult> DeleteAsync()
-	{
-		await this._honeyService.DeleteAsync();
-		return (NoContent());	
-	}
-
-	[HttpPost]
-	public async Task<ActionResult> PostAsync(
-		Honey honey)
-	{
-		await this._honeyService.PostAsync(honey);
-		return Ok();
-	}
-
 	[HttpGet("{id}")]
 	public async Task<ActionResult<Honey>> GetAsync(
-		long id)
+		[FromRoute] long id)
 	{
 		Honey? honeys = await this._honeyService.FindAsync(id);
 		return (honeys == null ? NotFound() : honeys);
@@ -53,7 +32,7 @@ public class HoneyController
 
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> DeleteAsync(
-		long id)
+		[FromRoute] long id)
 	{
 		IActionResult? result = await this._honeyService.DeleteAsync(id);
 		return (result == null ? NotFound() : NoContent());	
@@ -61,11 +40,10 @@ public class HoneyController
 
 	[HttpPut("{id}")]
 	public async Task<ActionResult> PutAsync(
-		long id, Honey honey)
+		[FromRoute] long id, 
+		[FromBody] Honey honey)
 	{
 		IActionResult? result = await this._honeyService.PutAsync(id, honey);
-		return (result == null ? NotFound() : (ActionResult)result);	
+		return (result == null ? NotFound() : (ActionResult)result);
 	}
-
-
 }
